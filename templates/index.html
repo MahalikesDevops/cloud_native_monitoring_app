@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indicator Gauge Chart</title>
+    <!-- Include Chart.js library from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1 align="center">System Monitoring</h1>
+        {% if message %}
+        <div class="alert alert-danger">{{ message }}</div>
+        {% endif %}
+    </div>
+
+<!-- Canvas element to render the CPU Usage chart -->
+<canvas id="cpuChart" width="10" height="10"></canvas>
+
+<!-- Canvas element to render the Memory Usage chart -->
+<canvas id="memChart" width="10" height="10"></canvas>
+
+<script>
+// Retrieve the CPU and Memory percentage values from the Python code
+var cpuPercent = {{ cpu_percent|default(0) }};
+var memPercent = {{ mem_percent|default(0) }};
+
+// Get the canvas elements
+var cpuCanvas = document.getElementById('cpuChart');
+var memCanvas = document.getElementById('memChart');
+
+// Create separate configurations for CPU and Memory charts
+var cpuConfig = {
+    type: 'doughnut',
+    data: {
+        labels: ['CPU Usage'],
+        datasets: [{
+            data: [cpuPercent, 100 - cpuPercent],
+            backgroundColor: ['#36A2EB', '#E7E7E7'],
+            hoverBackgroundColor: ['#36A2EB', '#E7E7E7'],
+        }]
+    },
+    options: {
+        elements: {
+            center: {
+                text: cpuPercent + '%',
+                color: '#000',
+                fontStyle: 'Arial', // Set the font style
+                sidePadding: 20 // Adjust the padding
+            }
+        }
+    }
+};
+
+var memConfig = {
+    type: 'doughnut',
+    data: {
+        labels: ['Memory Usage'],
+        datasets: [{
+            data: [memPercent, 100 - memPercent],
+            backgroundColor: ['#FF6384', '#E7E7E7'],
+            hoverBackgroundColor: ['#FF6384', '#E7E7E7'],
+        }]
+    },
+    options: {
+        elements: {
+            center: {
+                text: memPercent + '%',
+                color: '#000',
+                fontStyle: 'Arial', // Set the font style
+                sidePadding: 20 // Adjust the padding
+            }
+        }
+    }
+    
+};
+
+// Create and render the CPU and Memory charts
+var cpuChart = new Chart(cpuCanvas.getContext('2d'), cpuConfig);
+var memChart = new Chart(memCanvas.getContext('2d'), memConfig);
+
+</script>
+
+</body>
+</html>
